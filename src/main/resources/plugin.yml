@@ -1,0 +1,7 @@
+name: "${mod_name}"
+version: "${mod_version}"
+main: "${mod_group}.${mod_name}"
+description: "${mod_description}"
+author: "${mod_author}"
+website: "${mod_website}"
+api-version: "${minecraft_version}"

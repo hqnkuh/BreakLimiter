@@ -1,0 +1,32 @@
+plugins {
+	id "java"
+	id "xyz.jpenilla.run-paper" version "2.3.1"
+}
+
+group mod_group
+version mod_version
+base.archivesName = mod_name
+
+repositories {
+	mavenCentral()
+	maven { url "https://repo.papermc.io/repository/maven-public/" }
+}
+
+dependencies {
+	compileOnly "io.papermc.paper:paper-api:${minecraft_version}-R0.1-SNAPSHOT"
+}
+
+processResources {
+	filteringCharset "UTF-8"
+	filesMatching("plugin.yml") {
+		expand project.properties
+	}
+}
+
+runServer {
+	minecraftVersion minecraft_version
+}
+
+compileJava {
+	options.encoding = "UTF-8"
+}
