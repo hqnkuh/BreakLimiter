@@ -31,8 +31,8 @@ public class BreakLimitListener implements Listener {
 			event.setCancelled(true);
 
 		} else {
-			player.sendActionBar(Component.text("- " + count + " -", NamedTextColor.GRAY, TextDecoration.BOLD));
 			score.setScore(count - 1);
+			player.sendActionBar(Component.text("- " + count + " -", NamedTextColor.GRAY, TextDecoration.BOLD));
 		}
 	}
 }

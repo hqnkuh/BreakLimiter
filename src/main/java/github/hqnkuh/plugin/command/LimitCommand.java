@@ -12,6 +12,7 @@ import org.bukkit.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class LimitCommand extends Command {
@@ -32,18 +33,31 @@ public class LimitCommand extends Command {
 				sender.sendMessage(Component.text("Invalid number: ", NamedTextColor.RED).append(Component.text(args[0])));
 				return false;
 			}
-			Player player = Bukkit.getPlayer(args[1]);
-			if (player == null) {
-				sender.sendMessage(Component.text("Invalid player: ", NamedTextColor.RED).append(Component.text(args[1])));
-				return false;
-			}
 
-			Scoreboard scoreboard = initScoreboard(player, count);
-			player.setScoreboard(scoreboard);
-			if (scoreboard.getObjective("break_limiter") == null) {
-				sender.sendMessage(Component.text("制限が上書きされました", NamedTextColor.YELLOW));
+			if (args.length == 1) {
+				Bukkit.getOnlinePlayers().forEach(player -> {
+					Scoreboard scoreboard = initScoreboard(player, count);
+					player.setScoreboard(scoreboard);
+
+					if (scoreboard.getObjective("break_limiter") == null) {
+						sender.sendMessage(Component.text("制限が上書きされました", NamedTextColor.YELLOW));
+					}
+					sender.sendMessage(player.displayName().append(Component.text(" の制限を ", NamedTextColor.GREEN).append(Component.text(count, NamedTextColor.GREEN, TextDecoration.BOLD).append(Component.text(" に設定しました", NamedTextColor.GREEN)))));
+				});
+			} else {
+				Player player = Bukkit.getPlayer(args[1]);
+				if (player == null) {
+					sender.sendMessage(Component.text("Invalid player: ", NamedTextColor.RED).append(Component.text(args[1])));
+					return false;
+				}
+
+				Scoreboard scoreboard = initScoreboard(player, count);
+				player.setScoreboard(scoreboard);
+				if (scoreboard.getObjective("break_limiter") == null) {
+					sender.sendMessage(Component.text("制限が上書きされました", NamedTextColor.YELLOW));
+				}
+				sender.sendMessage(player.displayName().append(Component.text(" の制限を ", NamedTextColor.GREEN).append(Component.text(count, NamedTextColor.GREEN, TextDecoration.BOLD).append(Component.text(" に設定しました", NamedTextColor.GREEN)))));
 			}
-			sender.sendMessage(player.displayName().append(Component.text(" の制限を ", NamedTextColor.GREEN).append(Component.text(count, NamedTextColor.GREEN, TextDecoration.BOLD).append(Component.text(" に設定しました", NamedTextColor.GREEN)))));
 
 			return true;
 		}
@@ -67,9 +81,14 @@ public class LimitCommand extends Command {
 		String currency = args[args.length - 1];
 
 		if (args.length == 1) {
-			for (int i = 0; i < 9999; i++) {
-				if (StringUtil.startsWithIgnoreCase(Integer.toString(i), currency)) {
-					completer.add(Integer.toString(i));
+			List<Integer> counts = new ArrayList<>();
+			for (int i = 0; i < 100; i++) {
+				counts.add(i);
+			}
+			Collections.sort(counts);
+			for (Integer count : counts) {
+				if (StringUtil.startsWithIgnoreCase(count.toString(), currency)) {
+					completer.add(count.toString());
 				}
 			}
 		}
