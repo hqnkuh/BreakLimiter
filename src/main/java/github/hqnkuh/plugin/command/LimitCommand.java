@@ -1,5 +1,6 @@
 package github.hqnkuh.plugin.command;
 
+import github.hqnkuh.plugin.BreakLimiter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -12,12 +13,12 @@ import org.bukkit.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class LimitCommand extends Command {
 	public LimitCommand() {
 		super("limit");
+		setPermission(BreakLimiter.getInstance().getName() + ".limit");
 		setDescription("block break limiter settings command");
 		setUsage("/limit [count] <player>");
 	}
@@ -26,6 +27,17 @@ public class LimitCommand extends Command {
 	public boolean execute(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] args) {
 		// OP権限持ちのみ実行可能
 		if (sender.isOp()) {
+			if (args.length == 0) return false;
+
+			if (args.length == 1 && args[0].equalsIgnoreCase("reset")) {
+				Bukkit.getOnlinePlayers().forEach(player -> {
+					Objective objective = player.getScoreboard().getObjective("break_limiter");
+					if (objective != null) objective.unregister();
+				});
+				sender.sendMessage(Component.text("制限を削除しました", NamedTextColor.DARK_GREEN));
+				return true;
+			}
+
 			int count;
 			try {
 				count = Integer.parseInt(args[0]);
@@ -85,7 +97,11 @@ public class LimitCommand extends Command {
 			for (int i = 0; i < 100; i++) {
 				counts.add(i);
 			}
-			Collections.sort(counts);
+
+			if (StringUtil.startsWithIgnoreCase("reset", currency)) {
+				completer.add("reset");
+			}
+
 			for (Integer count : counts) {
 				if (StringUtil.startsWithIgnoreCase(count.toString(), currency)) {
 					completer.add(count.toString());
