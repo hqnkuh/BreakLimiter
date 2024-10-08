@@ -27,6 +27,8 @@ runServer {
 	minecraftVersion minecraft_version
 }
 
+java.toolchain.languageVersion = JavaLanguageVersion.of java_version
+
 compileJava {
 	options.encoding = "UTF-8"
 }
