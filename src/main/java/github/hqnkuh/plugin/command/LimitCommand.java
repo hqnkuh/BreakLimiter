@@ -26,54 +26,51 @@ public class LimitCommand extends Command {
 	@Override
 	public boolean execute(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] args) {
 		// OP権限持ちのみ実行可能
-		if (sender.isOp()) {
-			if (args.length == 0) return false;
+		if (args.length == 0) return false;
 
-			if (args.length == 1 && args[0].equalsIgnoreCase("reset")) {
-				Bukkit.getOnlinePlayers().forEach(player -> {
-					Objective objective = player.getScoreboard().getObjective("break_limiter");
-					if (objective != null) objective.unregister();
-				});
-				sender.sendMessage(Component.text("制限を削除しました", NamedTextColor.DARK_GREEN));
-				return true;
-			}
+		if (args.length == 1 && args[0].equalsIgnoreCase("reset")) {
+			Bukkit.getOnlinePlayers().forEach(player -> {
+				Objective objective = player.getScoreboard().getObjective("break_limiter");
+				if (objective != null) objective.unregister();
+			});
+			sender.sendMessage(Component.text("制限を削除しました", NamedTextColor.DARK_GREEN));
+			return true;
+		}
 
-			int count;
-			try {
-				count = Integer.parseInt(args[0]);
-			} catch (NumberFormatException e) {
-				sender.sendMessage(Component.text("Invalid number: ", NamedTextColor.RED).append(Component.text(args[0])));
-				return false;
-			}
+		int count;
+		try {
+			count = Integer.parseInt(args[0]);
+		} catch (NumberFormatException e) {
+			sender.sendMessage(Component.text("Invalid number: ", NamedTextColor.RED).append(Component.text(args[0])));
+			return false;
+		}
 
-			if (args.length == 1) {
-				Bukkit.getOnlinePlayers().forEach(player -> {
-					Scoreboard scoreboard = initScoreboard(player, count);
-					player.setScoreboard(scoreboard);
-
-					if (scoreboard.getObjective("break_limiter") == null) {
-						sender.sendMessage(Component.text("制限が上書きされました", NamedTextColor.YELLOW));
-					}
-					sender.sendMessage(player.displayName().append(Component.text(" の制限を ", NamedTextColor.GREEN).append(Component.text(count, NamedTextColor.GREEN, TextDecoration.BOLD).append(Component.text(" に設定しました", NamedTextColor.GREEN)))));
-				});
-			} else {
-				Player player = Bukkit.getPlayer(args[1]);
-				if (player == null) {
-					sender.sendMessage(Component.text("Invalid player: ", NamedTextColor.RED).append(Component.text(args[1])));
-					return false;
-				}
-
+		if (args.length == 1) {
+			Bukkit.getOnlinePlayers().forEach(player -> {
 				Scoreboard scoreboard = initScoreboard(player, count);
 				player.setScoreboard(scoreboard);
+
 				if (scoreboard.getObjective("break_limiter") == null) {
 					sender.sendMessage(Component.text("制限が上書きされました", NamedTextColor.YELLOW));
 				}
 				sender.sendMessage(player.displayName().append(Component.text(" の制限を ", NamedTextColor.GREEN).append(Component.text(count, NamedTextColor.GREEN, TextDecoration.BOLD).append(Component.text(" に設定しました", NamedTextColor.GREEN)))));
+			});
+		} else {
+			Player player = Bukkit.getPlayer(args[1]);
+			if (player == null) {
+				sender.sendMessage(Component.text("Invalid player: ", NamedTextColor.RED).append(Component.text(args[1])));
+				return false;
 			}
 
-			return true;
+			Scoreboard scoreboard = initScoreboard(player, count);
+			player.setScoreboard(scoreboard);
+			if (scoreboard.getObjective("break_limiter") == null) {
+				sender.sendMessage(Component.text("制限が上書きされました", NamedTextColor.YELLOW));
+			}
+			sender.sendMessage(player.displayName().append(Component.text(" の制限を ", NamedTextColor.GREEN).append(Component.text(count, NamedTextColor.GREEN, TextDecoration.BOLD).append(Component.text(" に設定しました", NamedTextColor.GREEN)))));
 		}
-		return false;
+
+		return true;
 	}
 
 	private Scoreboard initScoreboard(Player player, int count) {
